@@ -24,6 +24,21 @@ pub fn excited(name: &str) -> String {
     greeting
 }
 
+/// Greet trimmed, lowercased text.
+///
+/// The second `let name` is a new binding, not a change to the first. The
+/// first `name` is `&str`. The second is an owned `String`. This is
+/// shadowing, which does not need `mut`.
+///
+/// ```
+/// assert_eq!(greet::quiet_greet("  Ada  "), "Hello, ada!");
+/// ```
+pub fn quiet_greet(raw: &str) -> String {
+    let name = raw.trim();
+    let name = name.to_lowercase();
+    format!("Hello, {name}!")
+}
+
 #[cfg(test)]
 mod tests {
     use super::*;
@@ -39,5 +54,10 @@ mod tests {
     #[test]
     fn excited_changes_one_string() {
         assert_eq!(excited("Ada"), greet("Ada"));
+    }
+
+    #[test]
+    fn quiet_greet_shadows_a_trimmed_borrow_with_a_string() {
+        assert_eq!(quiet_greet("  Ada  "), "Hello, ada!");
     }
 }
