@@ -39,6 +39,19 @@ pub fn quiet_greet(raw: &str) -> String {
     format!("Hello, {name}!")
 }
 
+/// Shout `name` by taking ownership of it.
+///
+/// The parameter is `String`, not `&str`. The call moves `name`. Using `name`
+/// after `into_shout(name)` does not compile.
+///
+/// ```
+/// let name = String::from("ada");
+/// assert_eq!(greet::into_shout(name), "ADA!");
+/// ```
+pub fn into_shout(name: String) -> String {
+    format!("{}!", name.to_uppercase())
+}
+
 #[cfg(test)]
 mod tests {
     use super::*;
@@ -59,5 +72,12 @@ mod tests {
     #[test]
     fn quiet_greet_shadows_a_trimmed_borrow_with_a_string() {
         assert_eq!(quiet_greet("  Ada  "), "Hello, ada!");
+    }
+
+    #[test]
+    fn into_shout_takes_the_string() {
+        let name = String::from("ada");
+        let shouted = into_shout(name);
+        assert_eq!(shouted, "ADA!");
     }
 }
