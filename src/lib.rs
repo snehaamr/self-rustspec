@@ -79,6 +79,25 @@ pub fn push_bang(greeting: &mut String) {
     greeting.push('!');
 }
 
+/// Read the length, then append `!`.
+///
+/// `len()` borrows `greeting` to read it. That shared borrow ends at the
+/// semicolon. `push` then borrows it mutably. A shared borrow and a mutable
+/// borrow cannot both be active.
+///
+/// This does not compile, because `seen` still borrows `greeting` during `push`:
+///
+/// ```text
+/// let seen = greeting.as_str();
+/// greeting.push('!');
+/// let _ = seen;
+/// ```
+pub fn len_then_bang(greeting: &mut String) -> usize {
+    let len = greeting.len();
+    greeting.push('!');
+    len
+}
+
 #[cfg(test)]
 mod tests {
     use super::*;
@@ -121,5 +140,13 @@ mod tests {
         let mut greeting = String::from("Hello, Ada");
         push_bang(&mut greeting);
         assert_eq!(greeting, "Hello, Ada!");
+    }
+
+    #[test]
+    fn len_then_bang_reads_before_it_writes() {
+        let mut greeting = String::from("Hello");
+        let len = len_then_bang(&mut greeting);
+        assert_eq!(len, 5);
+        assert_eq!(greeting, "Hello!");
     }
 }
