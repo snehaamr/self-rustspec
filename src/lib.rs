@@ -98,6 +98,19 @@ pub fn len_then_bang(greeting: &mut String) -> usize {
     len
 }
 
+/// Return the first word, or `""` when `text` has none.
+///
+/// The result is a `&str` pointing into `text`. No new `String` is allocated.
+/// Returning `owned.as_str()` from a local `String` does not compile: that
+/// `String` is dropped at the end of the function, so the borrow would dangle.
+///
+/// ```
+/// assert_eq!(greet::first_word("Hello Ada"), "Hello");
+/// ```
+pub fn first_word(text: &str) -> &str {
+    text.split_whitespace().next().unwrap_or("")
+}
+
 #[cfg(test)]
 mod tests {
     use super::*;
@@ -148,5 +161,14 @@ mod tests {
         let len = len_then_bang(&mut greeting);
         assert_eq!(len, 5);
         assert_eq!(greeting, "Hello!");
+    }
+
+    #[test]
+    fn first_word_borrows_part_of_the_text() {
+        let text = String::from("Hello Ada");
+        let word = first_word(&text);
+        assert_eq!(word, "Hello");
+        assert_eq!(text, "Hello Ada");
+        assert_eq!(first_word("   "), "");
     }
 }
