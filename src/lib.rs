@@ -52,6 +52,19 @@ pub fn into_shout(name: String) -> String {
     format!("{}!", name.to_uppercase())
 }
 
+/// Return `count` twice. Both bindings stay usable.
+///
+/// `i32` is `Copy`, so `let saved = count` duplicates the value. A `String`
+/// is not `Copy`. Passing one to `into_shout` moves it instead.
+///
+/// ```
+/// assert_eq!(greet::copied_count(3), (3, 3));
+/// ```
+pub fn copied_count(count: i32) -> (i32, i32) {
+    let saved = count;
+    (count, saved)
+}
+
 #[cfg(test)]
 mod tests {
     use super::*;
@@ -79,5 +92,13 @@ mod tests {
         let name = String::from("ada");
         let shouted = into_shout(name);
         assert_eq!(shouted, "ADA!");
+    }
+
+    #[test]
+    fn copied_count_keeps_the_original() {
+        let count = 3;
+        let (left, right) = copied_count(count);
+        assert_eq!((left, right), (3, 3));
+        assert_eq!(count, 3);
     }
 }
