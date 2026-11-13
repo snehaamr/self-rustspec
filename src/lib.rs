@@ -65,6 +65,20 @@ pub fn copied_count(count: i32) -> (i32, i32) {
     (count, saved)
 }
 
+/// Append `!` to the caller's string.
+///
+/// `&mut String` borrows `greeting` and allows this function to change it.
+/// The caller still owns the `String`. `into_shout` would have taken it away.
+///
+/// ```
+/// let mut greeting = String::from("Hello, Ada");
+/// greet::push_bang(&mut greeting);
+/// assert_eq!(greeting, "Hello, Ada!");
+/// ```
+pub fn push_bang(greeting: &mut String) {
+    greeting.push('!');
+}
+
 #[cfg(test)]
 mod tests {
     use super::*;
@@ -100,5 +114,12 @@ mod tests {
         let (left, right) = copied_count(count);
         assert_eq!((left, right), (3, 3));
         assert_eq!(count, 3);
+    }
+
+    #[test]
+    fn push_bang_changes_the_callers_string() {
+        let mut greeting = String::from("Hello, Ada");
+        push_bang(&mut greeting);
+        assert_eq!(greeting, "Hello, Ada!");
     }
 }
