@@ -111,6 +111,20 @@ pub fn first_word(text: &str) -> &str {
     text.split_whitespace().next().unwrap_or("")
 }
 
+/// The first word, if `text` has one.
+///
+/// `Some(word)` borrows that word from `text`. `None` means there is no word.
+/// `first_word` turns that `None` into `""`. This function returns the
+/// `Option` itself, so the caller has to handle both cases.
+///
+/// ```
+/// assert_eq!(greet::maybe_first_word("Hello Ada"), Some("Hello"));
+/// assert_eq!(greet::maybe_first_word("   "), None);
+/// ```
+pub fn maybe_first_word(text: &str) -> Option<&str> {
+    text.split_whitespace().next()
+}
+
 #[cfg(test)]
 mod tests {
     use super::*;
@@ -170,5 +184,12 @@ mod tests {
         assert_eq!(word, "Hello");
         assert_eq!(text, "Hello Ada");
         assert_eq!(first_word("   "), "");
+    }
+
+    #[test]
+    fn maybe_first_word_is_some_or_none() {
+        assert_eq!(maybe_first_word("Hello Ada"), Some("Hello"));
+        assert_eq!(maybe_first_word("   "), None);
+        assert_eq!(maybe_first_word(""), None);
     }
 }
