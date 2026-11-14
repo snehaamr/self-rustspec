@@ -141,6 +141,24 @@ pub fn greet_first_word(text: &str) -> String {
     }
 }
 
+/// Greet the first word. When there is no word, return `text` unchanged.
+///
+/// `if let` handles one variant. The `else` branch covers everything else,
+/// here `None`, without naming it. `greet_first_word` uses `match` and lists
+/// both variants.
+///
+/// ```
+/// assert_eq!(greet::greet_if_some("Ada Lovelace"), "Hello, Ada!");
+/// assert_eq!(greet::greet_if_some("   "), "   ");
+/// ```
+pub fn greet_if_some(text: &str) -> String {
+    if let Some(word) = maybe_first_word(text) {
+        format!("Hello, {word}!")
+    } else {
+        text.to_string()
+    }
+}
+
 #[cfg(test)]
 mod tests {
     use super::*;
@@ -213,5 +231,11 @@ mod tests {
     fn greet_first_word_matches_both_cases() {
         assert_eq!(greet_first_word("Ada Lovelace"), "Hello, Ada!");
         assert_eq!(greet_first_word("   "), "Hello!");
+    }
+
+    #[test]
+    fn greet_if_some_handles_one_variant() {
+        assert_eq!(greet_if_some("Ada Lovelace"), "Hello, Ada!");
+        assert_eq!(greet_if_some("   "), "   ");
     }
 }
