@@ -125,6 +125,22 @@ pub fn maybe_first_word(text: &str) -> Option<&str> {
     text.split_whitespace().next()
 }
 
+/// Greet the first word, or greet nobody when there is no word.
+///
+/// `match` has to list every variant. `Some(word)` names the borrowed word.
+/// `None` is the other case. Deleting the `None` arm does not compile.
+///
+/// ```
+/// assert_eq!(greet::greet_first_word("Ada Lovelace"), "Hello, Ada!");
+/// assert_eq!(greet::greet_first_word("   "), "Hello!");
+/// ```
+pub fn greet_first_word(text: &str) -> String {
+    match maybe_first_word(text) {
+        Some(word) => format!("Hello, {word}!"),
+        None => String::from("Hello!"),
+    }
+}
+
 #[cfg(test)]
 mod tests {
     use super::*;
@@ -191,5 +207,11 @@ mod tests {
         assert_eq!(maybe_first_word("Hello Ada"), Some("Hello"));
         assert_eq!(maybe_first_word("   "), None);
         assert_eq!(maybe_first_word(""), None);
+    }
+
+    #[test]
+    fn greet_first_word_matches_both_cases() {
+        assert_eq!(greet_first_word("Ada Lovelace"), "Hello, Ada!");
+        assert_eq!(greet_first_word("   "), "Hello!");
     }
 }
