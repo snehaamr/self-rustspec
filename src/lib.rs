@@ -159,6 +159,33 @@ pub fn greet_if_some(text: &str) -> String {
     }
 }
 
+/// A greeting. `Hello` carries a name. `Wave` carries nothing.
+///
+/// `Hello` holds a `String`, so `Greeting` is not `Copy`. `Option` is an enum
+/// from the standard library. This one is defined here.
+#[derive(Debug, Clone, PartialEq, Eq)]
+pub enum Greeting {
+    Hello(String),
+    Wave,
+}
+
+/// Describe `greeting` without taking ownership of it.
+///
+/// The match lists every variant. `Hello(name)` binds the carried `String`
+/// as a borrow, because the input is `&Greeting`.
+///
+/// ```
+/// let greeting = greet::Greeting::Hello(String::from("Ada"));
+/// assert_eq!(greet::describe(&greeting), "Hello, Ada!");
+/// assert_eq!(greet::describe(&greet::Greeting::Wave), "wave");
+/// ```
+pub fn describe(greeting: &Greeting) -> String {
+    match greeting {
+        Greeting::Hello(name) => format!("Hello, {name}!"),
+        Greeting::Wave => String::from("wave"),
+    }
+}
+
 #[cfg(test)]
 mod tests {
     use super::*;
@@ -237,5 +264,13 @@ mod tests {
     fn greet_if_some_handles_one_variant() {
         assert_eq!(greet_if_some("Ada Lovelace"), "Hello, Ada!");
         assert_eq!(greet_if_some("   "), "   ");
+    }
+
+    #[test]
+    fn describe_matches_each_greeting_variant() {
+        let greeting = Greeting::Hello(String::from("Ada"));
+        assert_eq!(describe(&greeting), "Hello, Ada!");
+        assert_eq!(greeting, Greeting::Hello(String::from("Ada")));
+        assert_eq!(describe(&Greeting::Wave), "wave");
     }
 }
