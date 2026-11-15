@@ -186,6 +186,30 @@ pub fn describe(greeting: &Greeting) -> String {
     }
 }
 
+/// A person being greeted. Every `Person` has a `name`.
+///
+/// A struct keeps all of its fields at once. An enum is one variant at a time.
+/// `name` is a `String`, so `Person` is not `Copy`.
+#[derive(Debug, Clone, PartialEq, Eq)]
+pub struct Person {
+    pub name: String,
+}
+
+impl Person {
+    /// Borrow this person and return a greeting.
+    ///
+    /// `&self` is the same kind of shared borrow as `&Person`. The caller
+    /// keeps the `Person`.
+    ///
+    /// ```
+    /// let ada = greet::Person { name: String::from("Ada") };
+    /// assert_eq!(ada.greeting(), "Hello, Ada!");
+    /// ```
+    pub fn greeting(&self) -> String {
+        format!("Hello, {}!", self.name)
+    }
+}
+
 #[cfg(test)]
 mod tests {
     use super::*;
@@ -272,5 +296,14 @@ mod tests {
         assert_eq!(describe(&greeting), "Hello, Ada!");
         assert_eq!(greeting, Greeting::Hello(String::from("Ada")));
         assert_eq!(describe(&Greeting::Wave), "wave");
+    }
+
+    #[test]
+    fn person_greeting_borrows_self() {
+        let ada = Person {
+            name: String::from("Ada"),
+        };
+        assert_eq!(ada.greeting(), "Hello, Ada!");
+        assert_eq!(ada.name, "Ada");
     }
 }
