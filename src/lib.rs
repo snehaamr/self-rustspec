@@ -208,6 +208,20 @@ impl Person {
     pub fn greeting(&self) -> String {
         format!("Hello, {}!", self.name)
     }
+
+    /// Replace this person's name. The caller still owns the `Person`.
+    ///
+    /// `&mut self` is a mutable borrow, the same kind as `&mut Person`.
+    /// `greeting` only reads through `&self` and cannot call `rename`.
+    ///
+    /// ```
+    /// let mut ada = greet::Person { name: String::from("Ada") };
+    /// ada.rename("Grace");
+    /// assert_eq!(ada.greeting(), "Hello, Grace!");
+    /// ```
+    pub fn rename(&mut self, name: &str) {
+        self.name = name.to_string();
+    }
 }
 
 #[cfg(test)]
@@ -305,5 +319,15 @@ mod tests {
         };
         assert_eq!(ada.greeting(), "Hello, Ada!");
         assert_eq!(ada.name, "Ada");
+    }
+
+    #[test]
+    fn rename_mutably_borrows_self() {
+        let mut ada = Person {
+            name: String::from("Ada"),
+        };
+        ada.rename("Grace");
+        assert_eq!(ada.name, "Grace");
+        assert_eq!(ada.greeting(), "Hello, Grace!");
     }
 }
