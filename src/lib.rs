@@ -196,6 +196,22 @@ pub struct Person {
 }
 
 impl Person {
+    /// Build a person from a borrowed name.
+    ///
+    /// `new` has no `self`, so it is an associated function, not a method.
+    /// Call it as `Person::new`. It creates a `Person` instead of borrowing
+    /// or moving an existing one.
+    ///
+    /// ```
+    /// let ada = greet::Person::new("Ada");
+    /// assert_eq!(ada.greeting(), "Hello, Ada!");
+    /// ```
+    pub fn new(name: &str) -> Self {
+        Self {
+            name: name.to_string(),
+        }
+    }
+
     /// Borrow this person and return a greeting.
     ///
     /// `&self` is the same kind of shared borrow as `&Person`. The caller
@@ -351,5 +367,12 @@ mod tests {
         };
         let name = ada.into_name();
         assert_eq!(name, "Ada");
+    }
+
+    #[test]
+    fn new_builds_a_person_without_self() {
+        let ada = Person::new("Ada");
+        assert_eq!(ada.greeting(), "Hello, Ada!");
+        assert_eq!(ada.name, "Ada");
     }
 }
