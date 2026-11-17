@@ -222,6 +222,19 @@ impl Person {
     pub fn rename(&mut self, name: &str) {
         self.name = name.to_string();
     }
+
+    /// Take ownership of this person and return the name.
+    ///
+    /// `self` moves the `Person` into the method. Using the person after
+    /// `into_name` does not compile. `greeting` and `rename` only borrow it.
+    ///
+    /// ```
+    /// let ada = greet::Person { name: String::from("Ada") };
+    /// assert_eq!(ada.into_name(), "Ada");
+    /// ```
+    pub fn into_name(self) -> String {
+        self.name
+    }
 }
 
 #[cfg(test)]
@@ -329,5 +342,14 @@ mod tests {
         ada.rename("Grace");
         assert_eq!(ada.name, "Grace");
         assert_eq!(ada.greeting(), "Hello, Grace!");
+    }
+
+    #[test]
+    fn into_name_takes_ownership_of_self() {
+        let ada = Person {
+            name: String::from("Ada"),
+        };
+        let name = ada.into_name();
+        assert_eq!(name, "Ada");
     }
 }
