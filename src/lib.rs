@@ -212,6 +212,26 @@ impl Person {
         }
     }
 
+    /// Build a person when `name` is not blank. Otherwise, say why it failed.
+    ///
+    /// `Ok(person)` carries the new `Person`. `Err` carries a message and no
+    /// person. `new` always returns a `Person`, even for `""`. `Option` would
+    /// only say the name was missing. `Result` also says what went wrong.
+    ///
+    /// ```
+    /// let ada = greet::Person::try_new("Ada").unwrap();
+    /// assert_eq!(ada.greeting(), "Hello, Ada!");
+    /// assert_eq!(greet::Person::try_new("   "), Err("name is empty"));
+    /// ```
+    pub fn try_new(name: &str) -> Result<Self, &'static str> {
+        let name = name.trim();
+        if name.is_empty() {
+            Err("name is empty")
+        } else {
+            Ok(Self::new(name))
+        }
+    }
+
     /// Borrow this person and return a greeting.
     ///
     /// `&self` is the same kind of shared borrow as `&Person`. The caller
@@ -374,5 +394,12 @@ mod tests {
         let ada = Person::new("Ada");
         assert_eq!(ada.greeting(), "Hello, Ada!");
         assert_eq!(ada.name, "Ada");
+    }
+
+    #[test]
+    fn try_new_is_ok_or_err() {
+        let ada = Person::try_new(" Ada ").unwrap();
+        assert_eq!(ada.name, "Ada");
+        assert_eq!(Person::try_new("   "), Err("name is empty"));
     }
 }
