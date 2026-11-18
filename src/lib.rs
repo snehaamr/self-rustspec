@@ -273,6 +273,23 @@ impl Person {
     }
 }
 
+/// Greet a trimmed name, or explain why the name cannot be greeted.
+///
+/// `match` has to list every variant. `Ok(person)` names the built person.
+/// `Err(message)` names the failure. Deleting the `Err` arm does not compile.
+/// `try_new` returns the `Result`. This function handles both cases.
+///
+/// ```
+/// assert_eq!(greet::greet_checked("Ada"), "Hello, Ada!");
+/// assert_eq!(greet::greet_checked("   "), "cannot greet: name is empty");
+/// ```
+pub fn greet_checked(name: &str) -> String {
+    match Person::try_new(name) {
+        Ok(person) => person.greeting(),
+        Err(message) => format!("cannot greet: {message}"),
+    }
+}
+
 #[cfg(test)]
 mod tests {
     use super::*;
@@ -401,5 +418,11 @@ mod tests {
         let ada = Person::try_new(" Ada ").unwrap();
         assert_eq!(ada.name, "Ada");
         assert_eq!(Person::try_new("   "), Err("name is empty"));
+    }
+
+    #[test]
+    fn greet_checked_matches_ok_and_err() {
+        assert_eq!(greet_checked(" Ada "), "Hello, Ada!");
+        assert_eq!(greet_checked("   "), "cannot greet: name is empty");
     }
 }
