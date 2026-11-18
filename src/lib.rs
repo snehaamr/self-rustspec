@@ -290,6 +290,21 @@ pub fn greet_checked(name: &str) -> String {
     }
 }
 
+/// Greet a trimmed name, or pass the error back to the caller.
+///
+/// `?` unwraps `Ok` and continues. On `Err`, it returns that error from this
+/// function immediately. The error type has to match this function's `Err`,
+/// here `&str`. `greet_checked` matches both arms and always returns a `String`.
+///
+/// ```
+/// assert_eq!(greet::try_greet("Ada").unwrap(), "Hello, Ada!");
+/// assert_eq!(greet::try_greet("   "), Err("name is empty"));
+/// ```
+pub fn try_greet(name: &str) -> Result<String, &'static str> {
+    let person = Person::try_new(name)?;
+    Ok(person.greeting())
+}
+
 #[cfg(test)]
 mod tests {
     use super::*;
@@ -424,5 +439,11 @@ mod tests {
     fn greet_checked_matches_ok_and_err() {
         assert_eq!(greet_checked(" Ada "), "Hello, Ada!");
         assert_eq!(greet_checked("   "), "cannot greet: name is empty");
+    }
+
+    #[test]
+    fn try_greet_returns_the_error_early() {
+        assert_eq!(try_greet(" Ada ").unwrap(), "Hello, Ada!");
+        assert_eq!(try_greet("   "), Err("name is empty"));
     }
 }
