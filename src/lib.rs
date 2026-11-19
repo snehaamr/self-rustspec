@@ -305,6 +305,21 @@ pub fn try_greet(name: &str) -> Result<String, &'static str> {
     Ok(person.greeting())
 }
 
+/// Greet a trimmed name, or return how long the error message is.
+///
+/// `try_new` fails with `&str`. This function fails with `usize`. `?` cannot
+/// return the `&str` error, because the types differ. `map_err` changes only
+/// the `Err` and leaves `Ok` alone. Then `?` can return it.
+///
+/// ```
+/// assert_eq!(greet::try_greet_len("Ada").unwrap(), "Hello, Ada!");
+/// assert_eq!(greet::try_greet_len("   "), Err("name is empty".len()));
+/// ```
+pub fn try_greet_len(name: &str) -> Result<String, usize> {
+    let person = Person::try_new(name).map_err(|message| message.len())?;
+    Ok(person.greeting())
+}
+
 #[cfg(test)]
 mod tests {
     use super::*;
@@ -445,5 +460,11 @@ mod tests {
     fn try_greet_returns_the_error_early() {
         assert_eq!(try_greet(" Ada ").unwrap(), "Hello, Ada!");
         assert_eq!(try_greet("   "), Err("name is empty"));
+    }
+
+    #[test]
+    fn try_greet_len_maps_the_error_before_question_mark() {
+        assert_eq!(try_greet_len(" Ada ").unwrap(), "Hello, Ada!");
+        assert_eq!(try_greet_len("   "), Err("name is empty".len()));
     }
 }
