@@ -320,6 +320,21 @@ pub fn try_greet_len(name: &str) -> Result<String, usize> {
     Ok(person.greeting())
 }
 
+/// Greet a trimmed name in uppercase, or pass the error through.
+///
+/// `map` changes only the `Ok` value. The closure runs for `Ok(Person)` and
+/// turns it into `Ok(String)`. `Err` is left alone, so the closure does not
+/// run and the error stays `&str`. `map_err` does the opposite. `try_greet`
+/// uses `?` and then wraps a new `Ok`.
+///
+/// ```
+/// assert_eq!(greet::try_greet_upper("Ada").unwrap(), "HELLO, ADA!");
+/// assert_eq!(greet::try_greet_upper("   "), Err("name is empty"));
+/// ```
+pub fn try_greet_upper(name: &str) -> Result<String, &'static str> {
+    Person::try_new(name).map(|person| person.greeting().to_uppercase())
+}
+
 #[cfg(test)]
 mod tests {
     use super::*;
@@ -466,5 +481,11 @@ mod tests {
     fn try_greet_len_maps_the_error_before_question_mark() {
         assert_eq!(try_greet_len(" Ada ").unwrap(), "Hello, Ada!");
         assert_eq!(try_greet_len("   "), Err("name is empty".len()));
+    }
+
+    #[test]
+    fn try_greet_upper_maps_the_ok_value() {
+        assert_eq!(try_greet_upper(" Ada ").unwrap(), "HELLO, ADA!");
+        assert_eq!(try_greet_upper("   "), Err("name is empty"));
     }
 }
