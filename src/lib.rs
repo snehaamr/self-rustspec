@@ -335,6 +335,28 @@ pub fn try_greet_upper(name: &str) -> Result<String, &'static str> {
     Person::try_new(name).map(|person| person.greeting().to_uppercase())
 }
 
+/// Greet a trimmed name that fits in `limit` characters, or say why not.
+///
+/// `map` would nest the closure's `Result` inside `Ok`, so the type would be
+/// `Result<Result<String, &str>, &str>`. `and_then` flattens that to one
+/// `Result`. The closure runs only for `Ok`. An `Err` from `try_new` passes
+/// through, and the closure can return its own `Err`.
+///
+/// ```
+/// assert_eq!(greet::try_greet_short("Ada", 3).unwrap(), "Hello, Ada!");
+/// assert_eq!(greet::try_greet_short("   ", 3), Err("name is empty"));
+/// assert_eq!(greet::try_greet_short("Grace", 3), Err("name is too long"));
+/// ```
+pub fn try_greet_short(name: &str, limit: usize) -> Result<String, &'static str> {
+    Person::try_new(name).and_then(|person| {
+        if person.name.len() > limit {
+            Err("name is too long")
+        } else {
+            Ok(person.greeting())
+        }
+    })
+}
+
 #[cfg(test)]
 mod tests {
     use super::*;
@@ -487,5 +509,12 @@ mod tests {
     fn try_greet_upper_maps_the_ok_value() {
         assert_eq!(try_greet_upper(" Ada ").unwrap(), "HELLO, ADA!");
         assert_eq!(try_greet_upper("   "), Err("name is empty"));
+    }
+
+    #[test]
+    fn try_greet_short_chains_another_result() {
+        assert_eq!(try_greet_short(" Ada ", 3).unwrap(), "Hello, Ada!");
+        assert_eq!(try_greet_short("   ", 3), Err("name is empty"));
+        assert_eq!(try_greet_short("Grace", 3), Err("name is too long"));
     }
 }
