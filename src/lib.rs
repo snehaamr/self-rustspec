@@ -357,6 +357,26 @@ pub fn try_greet_short(name: &str, limit: usize) -> Result<String, &'static str>
     })
 }
 
+/// Greet `name` when it is not blank. Otherwise greet `fallback`.
+///
+/// `and_then` runs its closure only for `Ok`, and that closure may change the
+/// `Ok` type. `or_else` runs its closure only for `Err`. The `Ok` type stays
+/// `Person`, so the closure returns `Result<Person, _>`. Returning a greeting
+/// from that closure does not compile. `map` afterward turns `Person` into the
+/// greeting. An `Ok` from the first `try_new` passes through, so a blank
+/// `fallback` is never tried.
+///
+/// ```
+/// assert_eq!(greet::try_greet_or("Ada", "   ").unwrap(), "Hello, Ada!");
+/// assert_eq!(greet::try_greet_or("   ", "Grace").unwrap(), "Hello, Grace!");
+/// assert_eq!(greet::try_greet_or("   ", "   "), Err("name is empty"));
+/// ```
+pub fn try_greet_or(name: &str, fallback: &str) -> Result<String, &'static str> {
+    Person::try_new(name)
+        .or_else(|_| Person::try_new(fallback))
+        .map(|person| person.greeting())
+}
+
 #[cfg(test)]
 mod tests {
     use super::*;
@@ -516,5 +536,12 @@ mod tests {
         assert_eq!(try_greet_short(" Ada ", 3).unwrap(), "Hello, Ada!");
         assert_eq!(try_greet_short("   ", 3), Err("name is empty"));
         assert_eq!(try_greet_short("Grace", 3), Err("name is too long"));
+    }
+
+    #[test]
+    fn try_greet_or_runs_the_closure_only_on_err() {
+        assert_eq!(try_greet_or(" Ada ", "   ").unwrap(), "Hello, Ada!");
+        assert_eq!(try_greet_or("   ", " Grace ").unwrap(), "Hello, Grace!");
+        assert_eq!(try_greet_or("   ", "   "), Err("name is empty"));
     }
 }
