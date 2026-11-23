@@ -377,6 +377,21 @@ pub fn try_greet_or(name: &str, fallback: &str) -> Result<String, &'static str> 
         .map(|person| person.greeting())
 }
 
+/// Greet a trimmed name, or wave when the name is blank.
+///
+/// `unwrap_or` returns the `Ok` string. On `Err` it returns the fallback and
+/// drops the error, so `"name is empty"` is gone. The function's type is
+/// `String`. `try_greet_or` stays a `Result` and can still fail. The fallback
+/// is built even when the name is fine.
+///
+/// ```
+/// assert_eq!(greet::greet_or_wave("Ada"), "Hello, Ada!");
+/// assert_eq!(greet::greet_or_wave("   "), "Hello!");
+/// ```
+pub fn greet_or_wave(name: &str) -> String {
+    try_greet(name).unwrap_or(String::from("Hello!"))
+}
+
 #[cfg(test)]
 mod tests {
     use super::*;
@@ -543,5 +558,11 @@ mod tests {
         assert_eq!(try_greet_or(" Ada ", "   ").unwrap(), "Hello, Ada!");
         assert_eq!(try_greet_or("   ", " Grace ").unwrap(), "Hello, Grace!");
         assert_eq!(try_greet_or("   ", "   "), Err("name is empty"));
+    }
+
+    #[test]
+    fn greet_or_wave_unwraps_or_uses_the_fallback() {
+        assert_eq!(greet_or_wave(" Ada "), "Hello, Ada!");
+        assert_eq!(greet_or_wave("   "), "Hello!");
     }
 }
