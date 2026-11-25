@@ -392,6 +392,21 @@ pub fn greet_or_wave(name: &str) -> String {
     try_greet(name).unwrap_or(String::from("Hello!"))
 }
 
+/// Greet a trimmed name, or explain the failure as a plain `String`.
+///
+/// `unwrap_or_else` returns the `Ok` string. On `Err` it runs the closure
+/// with that error and returns the closure's string. The closure does not
+/// run when the name is fine. `unwrap_or` cannot see the error, and it builds
+/// its fallback either way. The function's type is still `String`.
+///
+/// ```
+/// assert_eq!(greet::greet_or_explain("Ada"), "Hello, Ada!");
+/// assert_eq!(greet::greet_or_explain("   "), "cannot greet: name is empty");
+/// ```
+pub fn greet_or_explain(name: &str) -> String {
+    try_greet(name).unwrap_or_else(|message| format!("cannot greet: {message}"))
+}
+
 #[cfg(test)]
 mod tests {
     use super::*;
@@ -564,5 +579,11 @@ mod tests {
     fn greet_or_wave_unwraps_or_uses_the_fallback() {
         assert_eq!(greet_or_wave(" Ada "), "Hello, Ada!");
         assert_eq!(greet_or_wave("   "), "Hello!");
+    }
+
+    #[test]
+    fn greet_or_explain_runs_the_closure_only_on_err() {
+        assert_eq!(greet_or_explain(" Ada "), "Hello, Ada!");
+        assert_eq!(greet_or_explain("   "), "cannot greet: name is empty");
     }
 }
