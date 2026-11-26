@@ -407,6 +407,23 @@ pub fn greet_or_explain(name: &str) -> String {
     try_greet(name).unwrap_or_else(|message| format!("cannot greet: {message}"))
 }
 
+/// Put one greeting into a new list.
+///
+/// `Vec::new` is an empty list. `push` moves the greeting onto the end, so
+/// `greetings` is `mut`. The `Vec` owns that `String`. Without `mut`, `push`
+/// does not compile.
+///
+/// ```
+/// let mut expected = Vec::new();
+/// expected.push(String::from("Hello, Ada!"));
+/// assert_eq!(greet::push_greeting("Ada"), expected);
+/// ```
+pub fn push_greeting(name: &str) -> Vec<String> {
+    let mut greetings = Vec::new();
+    greetings.push(greet(name));
+    greetings
+}
+
 #[cfg(test)]
 mod tests {
     use super::*;
@@ -585,5 +602,12 @@ mod tests {
     fn greet_or_explain_runs_the_closure_only_on_err() {
         assert_eq!(greet_or_explain(" Ada "), "Hello, Ada!");
         assert_eq!(greet_or_explain("   "), "cannot greet: name is empty");
+    }
+
+    #[test]
+    fn push_greeting_owns_one_string() {
+        let mut expected = Vec::new();
+        expected.push(String::from("Hello, Ada!"));
+        assert_eq!(push_greeting("Ada"), expected);
     }
 }
