@@ -424,6 +424,27 @@ pub fn push_greeting(name: &str) -> Vec<String> {
     greetings
 }
 
+/// Greet two names, in order.
+///
+/// `names` holds both borrowed names. `for` takes one name on each pass, and
+/// `push` moves that greeting onto the list. `push_greeting` does this once,
+/// with no loop. The list ends with one greeting per name.
+///
+/// ```
+/// let mut expected = Vec::new();
+/// expected.push(String::from("Hello, Ada!"));
+/// expected.push(String::from("Hello, Grace!"));
+/// assert_eq!(greet::greet_both("Ada", "Grace"), expected);
+/// ```
+pub fn greet_both(first: &str, second: &str) -> Vec<String> {
+    let names = [first, second];
+    let mut greetings = Vec::new();
+    for name in names {
+        greetings.push(greet(name));
+    }
+    greetings
+}
+
 #[cfg(test)]
 mod tests {
     use super::*;
@@ -609,5 +630,13 @@ mod tests {
         let mut expected = Vec::new();
         expected.push(String::from("Hello, Ada!"));
         assert_eq!(push_greeting("Ada"), expected);
+    }
+
+    #[test]
+    fn greet_both_pushes_one_greeting_per_name() {
+        let mut expected = Vec::new();
+        expected.push(String::from("Hello, Ada!"));
+        expected.push(String::from("Hello, Grace!"));
+        assert_eq!(greet_both("Ada", "Grace"), expected);
     }
 }
