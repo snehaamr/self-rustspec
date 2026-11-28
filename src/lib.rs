@@ -457,7 +457,8 @@ pub fn greet_both(first: &str, second: &str) -> Vec<String> {
 /// expected.push(String::from("Hello, Grace!"));
 /// expected.push(String::from("Hello, Lin!"));
 /// assert_eq!(greet::greet_all(&["Ada", "Grace", "Lin"]), expected);
-/// assert_eq!(greet::greet_all(&[]), Vec::new());
+/// let empty: Vec<String> = Vec::new();
+/// assert_eq!(greet::greet_all(&[]), empty);
 /// ```
 pub fn greet_all(names: &[&str]) -> Vec<String> {
     let mut greetings = Vec::new();
@@ -669,6 +670,7 @@ mod tests {
         expected.push(String::from("Hello, Grace!"));
         expected.push(String::from("Hello, Lin!"));
         assert_eq!(greet_all(&["Ada", "Grace", "Lin"]), expected);
-        assert_eq!(greet_all(&[]), Vec::new());
+        let empty: Vec<String> = Vec::new();
+        assert_eq!(greet_all(&[]), empty);
     }
 }
