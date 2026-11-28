@@ -445,6 +445,28 @@ pub fn greet_both(first: &str, second: &str) -> Vec<String> {
     greetings
 }
 
+/// Greet every borrowed name, in order.
+///
+/// `names` is a slice. It borrows several names, and its length is not fixed
+/// at two the way `greet_both` is. `for` still takes one name each pass. The
+/// caller keeps the names. An empty slice produces an empty list.
+///
+/// ```
+/// let mut expected = Vec::new();
+/// expected.push(String::from("Hello, Ada!"));
+/// expected.push(String::from("Hello, Grace!"));
+/// expected.push(String::from("Hello, Lin!"));
+/// assert_eq!(greet::greet_all(&["Ada", "Grace", "Lin"]), expected);
+/// assert_eq!(greet::greet_all(&[]), Vec::new());
+/// ```
+pub fn greet_all(names: &[&str]) -> Vec<String> {
+    let mut greetings = Vec::new();
+    for name in names {
+        greetings.push(greet(name));
+    }
+    greetings
+}
+
 #[cfg(test)]
 mod tests {
     use super::*;
@@ -638,5 +660,15 @@ mod tests {
         expected.push(String::from("Hello, Ada!"));
         expected.push(String::from("Hello, Grace!"));
         assert_eq!(greet_both("Ada", "Grace"), expected);
+    }
+
+    #[test]
+    fn greet_all_borrows_a_slice_of_any_length() {
+        let mut expected = Vec::new();
+        expected.push(String::from("Hello, Ada!"));
+        expected.push(String::from("Hello, Grace!"));
+        expected.push(String::from("Hello, Lin!"));
+        assert_eq!(greet_all(&["Ada", "Grace", "Lin"]), expected);
+        assert_eq!(greet_all(&[]), Vec::new());
     }
 }
